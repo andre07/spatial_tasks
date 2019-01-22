@@ -1,0 +1,126 @@
+\documentclass{beamer}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usetheme{Madrid}
+
+\usepackage{lmodern}
+\usepackage{textpos}
+
+\usepackage{graphicx}
+\usepackage{animate}
+
+%\logo{\includegraphics[height=.8cm,keepaspectratio]{GfKlogo}
+
+\title{Fay-Herriot model}   
+\author{Andrzej Surma}
+\date{\today} 
+
+%\usepackage{beamerthemeshadow}
+%\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+
+\begin{document}
+
+	\begin{frame}
+		\titlepage
+	\end{frame} 
+	
+	\begin{frame}{Potrzebne dane z HHP}
+		\begin{itemize}
+			\item{kod GUS gminy gospodarstwa}
+			\item{wielkość gospodarstwa domowego}
+			\item{liczba dzieci (0-14), starszych (60+) w gospodarstwie}
+			\item{dochód netto gospodarstwa}
+			\item{klasa wielkości miejscowości}
+			\item{wiek i płeć członków rodziny}
+			\item{typ budynku}
+			\item{modelowana wartość ważona kryteriami panelowymi}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Potrzebne dane z HHP}
+		\begin{block}{}
+			Do kalibracji wyników, niezależnie potrzebujemy informacji o raportowanych oficjalnie wartościach na poziomie województwa
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Krok I}
+		\begin{block}{Selekcja zmiennych}
+			\begin{itemize}
+				\item{analiza korelacji}
+				\item{analiza graficzna np. boxplot}
+				\item{analiza regresji}
+			\end{itemize}
+		\end{block}
+		\begin{block}{OLS}
+			Zestaw zmiennych różnicujących średnie wydatki gospodarstwa, penetrację
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Krok II}
+		\begin{block}{Dane geo o gminach}
+		\end{block}
+		\begin{block}{Uwagi}
+			\begin{itemize}
+				\item{w geo: kody GUS ulegają aktualizacji każdego roku}
+				\item{w panelu: brak aktualizacji, kody niefunkcjonujące}
+			\end{itemize}
+		\end{block}
+		\begin{block}{Macierz dystansów}
+			poszukujemy podobnych gmin pod względem cech, które różnicują średnie wydatki gospodarstwa, penetrację
+		\end{block}
+		\begin{block}{Sąsiedztwo gmin i powiatów}
+			geograficzne ujęcie bliskości
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{Wiązkowanie gmin}
+			\animategraphics[controls,width=\linewidth]{1}{mapki/graph_}{1}{8}
+	\end{frame}
+	
+	\begin{frame}{Wiązkowanie gmin}
+		\begin{block}{}
+			\begin{itemize}
+				\item{dla każdej gminy definiujemy dla niej wiązkę gmin podobnych, która może zrzeszać podobne pod względem zdefiniowanych cech gminy z sąsiednich powiatów. Nie jest wymagane, aby wiązka była 'łukowo spójna', tzn. aby można było połączyć gminy z wiązki linią}
+				\item{grupa gmin podobnych - ważona metryka Gowera; wagi proporcjonalne do wyników metody selekcji zmiennych; Q3 dystansów jako cutpoint}
+				\item{podobieństwo - macierz odległości oraz sąsiedztwo geograficzne}
+				\item{uwierzytelnienie estymatora średniej wartości wydatków}
+				\item{brak możliwości wnioskowania na poziomie gmin na podstawie HHP}
+				\item{średnia oraz wariancja wartości wewnątrz wiązki}
+			\end{itemize}
+		\end{block}
+	\end{frame}
+
+	\begin{frame}{Model Faya-Herriota}
+		\begin{block}{}
+			\begin{displaymath}
+				y_{i} = x_{i}^T\beta + v_{i} + e_{i}
+			\end{displaymath}
+
+			\begin{displaymath}
+				\hat{\mu}_{i} = \hat{\gamma}_{i}\hat{y}_{i} + (1-\hat{\gamma}_{i})\bar{X}_{i}^T\hat{\beta}
+			\end{displaymath}
+			
+			\begin{itemize}
+				\item{i = 1,...,n - analizowane obszary - gminy}
+				\item{x - cechy wyjaśniające; y - zmienna wyjaśniana}
+				\item{v - element losowy na poziomie obszaru}
+				\item{$\beta$ - estymowane współczynniki}
+				\item{$\gamma$ - komponent wariancyjny z modelu FH}
+			\end{itemize}
+			
+		\end{block}		
+
+		\begin{block}{sae::eblupFH}
+			\small{Modelowanie średniej wartości zakupów per gospodarstwo w gminie.}
+			\footnotesize{Estymacja współczynników modelu odbywa się tylko na części gmin, dla których liczba raportujących	gospodarstw w odpowiednich wiązkach jest >= 30.}
+		\end{block}
+	\end{frame}
+
+	\begin{frame}{Kalibracja wyników}
+		\begin{block}{Ostatnia faza}
+			Za pomocą ważenia kwadratowego kalibracja wyników do wartości oficjalnie raportowanych przez HHP
+		\end{block}
+	\end{frame}
+	
+\end{document}
